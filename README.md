@@ -44,13 +44,13 @@ dotnet run --project DynamicCodeApi
 
 ### <a name="description"></a>Description
 
-In this programming task, you build upon the application scenario and your Kafka processing logic from your previous assignment. You are asked to design and implement a SFaaS platform on top of Orleans. You are provided with basic APIs to register and call functions and the remaining functionalities must be implemented, as follows.
+In this programming task, you build upon the application scenario and your Kafka processing logic from your previous assignment. You are asked to design and implement a SFaaS platform on top of Orleans. You are provided with basic APIs to register and call functions and the remaining functionalities must be implemented.
 
 Refer to the assignment description in Absalon for a complete
 
 ### <a name="basic-apis"></a>Basic APIs
 
-Your client program offers an HTTP server so you can perform basci operations in your SFaaS platform.
+Your client program offers an HTTP server so you can perform basic operations in your SFaaS platform.
 
 To register a function, submit a POST request (http://localhost:5244/register) with the following payload:
 ```

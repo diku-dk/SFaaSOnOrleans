@@ -1,5 +1,4 @@
-﻿using System;
-namespace Infra.Kafka;
+﻿namespace Infra.Kafka;
 
 public interface IConsumerGrain : IGrain
 {

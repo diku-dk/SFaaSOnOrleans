@@ -1,7 +1,9 @@
 ﻿using Confluent.Kafka;
+using Orleans.Concurrency;
 
 namespace Infra.Kafka;
 
+[Reentrant]
 public class ConsumerGrain : Grain, IConsumerGrain
 {
 	private IConsumer<string, string> _consumer;
@@ -12,17 +14,16 @@ public class ConsumerGrain : Grain, IConsumerGrain
 
     public override async Task OnActivateAsync(CancellationToken cancellationToken)
 	{
-    	  var config = new ConsumerConfig
-    	  {
-        	GroupId = "your-consumer-group",
-        	BootstrapServers = "localhost:9092",
-        	EnableAutoCommit = false
-    	  };
+    	var config = new ConsumerConfig
+    	{
+            GroupId = "your-consumer-group",
+            BootstrapServers = "localhost:9092",
+            EnableAutoCommit = false
+    	};
 
-    	  _consumer = new ConsumerBuilder<string, string>(config).Build();
+    	_consumer = new ConsumerBuilder<string, string>(config).Build();
         var topicPartitionOffset = 
-                  new TopicPartitionOffset(_topic, 
-                        new Partition(_partition), new Offset(_offset)); 
+                  new TopicPartitionOffset(_topic, new Partition(_partition), new Offset(_offset)); 
         _consumer.Assign(topicPartitionOffset);
 
     	_ = Task.Run(() => StartConsuming(cancellationToken), cancellationToken);
@@ -32,33 +33,33 @@ public class ConsumerGrain : Grain, IConsumerGrain
 
 	private async Task StartConsuming(CancellationToken cancellationToken)
 	{
-    	  try
-    	  {
-          while (!cancellationToken.IsCancellationRequested)
-          {
-            try
+    	try
+    	{
+            while (!cancellationToken.IsCancellationRequested)
             {
-               var consumeResult = _consumer.Consume(cancellationToken);
-               await ProcessMessageAsync(consumeResult.Message.Key, consumeResult.Message.Value);
+                try
+                {
+                    var consumeResult = _consumer.Consume(cancellationToken);
+                    await ProcessMessageAsync(consumeResult.Message.Key, consumeResult.Message.Value);
+                }
+                catch (ConsumeException e)
+                {
+                    Console.WriteLine($"Consume error: {e.Error.Reason}");
+                }
             }
-            catch (ConsumeException e)
-            {
-               Console.WriteLine($"Consume error: {e.Error.Reason}");
-            }
-          }
-    	  }
-    	  catch (Exception){}
-    	  finally
-    	  {
-        	_consumer.Close();
-    	  }
+    	}
+    	catch (Exception){}
+    	finally
+    	{
+            _consumer.Close();
+    	}
 	}
 
 	private static Task ProcessMessageAsync(string key, string value)
 	{
-    	  // Handle the Kafka message
-    	  Console.WriteLine($"Received message: Key = {key}, Value = {value}");
-    	  return Task.CompletedTask;
+    	// TODO Handle the Kafka message
+    	Console.WriteLine($"Received message: Key = {key}, Value = {value}");
+    	throw new NotImplementedException();
 	}
 
 	public override Task OnDeactivateAsync(DeactivationReason reason, CancellationToken cancellationToken)

@@ -44,6 +44,7 @@ internal class WorkloadGenerator
 
     public async Task InitAllActors()
     {
+        throw new NotImplementedException();
         /*
         var analyticsActor = client.GetGrain<IAnalyticsActor>(0);
         await analyticsActor.Init();

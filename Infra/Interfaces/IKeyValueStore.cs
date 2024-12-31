@@ -1,15 +1,9 @@
 ﻿namespace Infra.Interfaces;
 
-/**
- * TODO Implement this interface
- */
 public interface IKeyValueStore
 {
-    void BeginTransaction(){ throw new NotImplementedException(); }
-    void Commit() { throw new NotImplementedException(); }
-
-    object Get(string key) { throw new NotImplementedException(); }
-    void Put(string key, object value) { throw new NotImplementedException(); }
+    T Get<T>(string key) { throw new NotImplementedException(); }
+    string GetString(string key) { throw new NotImplementedException(); }
+    void Put<T>(string key, T value) { throw new NotImplementedException(); }
 }
-
 

@@ -1,4 +1,6 @@
-﻿using Infra.Interfaces;
+﻿using DynamicCodeApi;
+using Infra.Interfaces;
+using Infra.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Controller;
@@ -8,10 +10,12 @@ namespace Controller;
 public class CodeController : ControllerBase
 {
     private readonly IKeyValueStore kvs;
+    private readonly IClusterClient client;
 
     public CodeController(IKeyValueStore kvs)
     {
         this.kvs = kvs;
+        this.client = OrleansClientManager.GetClient().Result;
     }
 
     public class CodeRegistrationRequest
@@ -26,7 +30,7 @@ public class CodeController : ControllerBase
         public object[] Parameters { get; set; }
     }
 
-    // Register code
+    // Register function
     [HttpPost("register")]
     public IActionResult RegisterFunction([FromBody] CodeRegistrationRequest request)
     {
@@ -38,17 +42,23 @@ public class CodeController : ControllerBase
         return Ok($"Function '{request.FunctionName}' registered successfully.");
     }
 
-    // Execute code
-    [HttpPost("execute")]
-    public IActionResult ExecuteFunction([FromBody] FunctionExecutionRequest request)
+    // TODO Register function composition
+    [HttpPost("compose")]
+    public IActionResult RegisterComposition()
     {
-        if (this.kvs.Get(request.FunctionName) == null){
+        throw new NotImplementedException();
+    }
+
+    // Execute function
+    [HttpPost("execute")]
+    public async Task<IActionResult> ExecuteFunction([FromBody] FunctionExecutionRequest request)
+    {
+        if (this.kvs.GetString(request.FunctionName) == null){
             return NotFound($"Function '{request.FunctionName}' not found.");
         }
-
         try
         {
-            var result = this.Dispatch(request.FunctionName, request.Parameters);
+            var result = await this.Dispatch(request.FunctionName, request.Parameters);
             return Ok(result);
         }
         catch (Exception ex)
@@ -57,14 +67,30 @@ public class CodeController : ControllerBase
         }
     }
 
-    // TODO Dispatch the function workflow
-    private object Dispatch(string functionName, object[] parameters)
+    // Test function
+    [HttpPost("test")]
+    public async Task<IActionResult> TestFunction([FromBody] FunctionExecutionRequest request)
     {
-        throw new NotImplementedException();
+        if (this.kvs.GetString(request.FunctionName) == null){
+            return NotFound($"Function '{request.FunctionName}' not found.");
+        }
+        try
+        {
+            // Example below should only be used for testing purposes
+            var worker = this.client.GetGrain<IExecutorGrain>(0);
+            return Ok(await worker.Execute(request.FunctionName, request.Parameters));
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error executing function: {ex}");
+        }
     }
 
-    // TODO Register function composition
-    // [HttpPost("compose")]
-    // public IActionResult RegisterComposition(...
+    // Dispatch the function workflow request for execution
+    private Task<object> Dispatch(string functionName, object[] parameters)
+    {
+        // TODO pick a well-defind MediatorGrain and call InitWorkflow
+        throw new NotImplementedException();
+    }
 
 }

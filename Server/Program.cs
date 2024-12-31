@@ -26,7 +26,7 @@ using var host = new HostBuilder()
             {
                 ser.AddNewtonsoftJsonSerializer(isSupported: type => type.Namespace.StartsWith("Infra"));
             })
-            // TODO .AddSingleton(YourKeyValueStoreImpl)
+            .AddSingleton<IKeyValueStore, RedisKVS>();
             ;
     })
     .Build();

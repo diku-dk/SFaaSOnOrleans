@@ -7,8 +7,10 @@ public class Constants
     public const string ClusterId = "LocalTestCluster";
     public const string ServiceId = "SFaaS";
 
-    public const string kafkaService = "localhost:9092";
-    public const string groupId = "test-consumer-group";
-    public const string zooKeeperService = "localhost:2181";
+    public const string KafkaService = "localhost:9092";
+    public const string ZooKeeperService = "localhost:2181";
+
+    public const string RedisPrimary = "localhost:6379";
+    public const string RedisSecondary = "localhost:6380";
 }
 

@@ -16,6 +16,7 @@ public class ExecutorGrain : Grain, IExecutorGrain
 
     private readonly IKeyValueStore kvs;
 
+    // Use logger if necessary
     private readonly ILogger<ExecutorGrain> logger;
 
 	public ExecutorGrain(IKeyValueStore kvs, ILogger<ExecutorGrain> logger)
@@ -24,9 +25,9 @@ public class ExecutorGrain : Grain, IExecutorGrain
         this.logger = logger;
 	}
 
-    public Task Execute(string functionName, object[] parameters)
+    public Task<object> Execute(string functionName, object[] parameters)
     {
-        var code = (string) this.kvs.Get(functionName) ?? throw new Exception($"Function '{functionName}' not found.");
+        var code = this.kvs.GetString(functionName) ?? throw new Exception($"Function '{functionName}' not found.");
         return Task.FromResult(DoExecute(functionName, code, this.kvs, parameters));
     }
 

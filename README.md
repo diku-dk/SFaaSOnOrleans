@@ -52,7 +52,7 @@ Refer to the assignment description in Absalon for a complete
 
 Your client program offers an HTTP server so you can perform basic operations in your SFaaS platform.
 
-To register a function, submit a POST request (http://localhost:5244/register) with the following payload:
+To register a simple function, submit a POST request (http://localhost:5244/register) with the following payload:
 ```
 {
     "FunctionName": "AddNumbers",
@@ -65,6 +65,26 @@ To invoke a function, submit a POST request (http://localhost:5244/execute) with
 {
     "FunctionName": "AddNumbers",
     "Parameters": [10, 20]
+}
+```
+
+To register a function that operates with state, make sure Redis is up and running and submit a POST request (http://localhost:5244/register) with the following payload:
+
+```
+{
+    "FunctionName": "TestRedis",
+    "Code": "
+            kvs.Put<string>(\"test\",\"test\");
+            return kvs.GetString(\"test\");
+            "
+}
+```
+
+Then invoke it:
+```
+{
+    "FunctionName": "TestRedis",
+    "Parameters": []
 }
 ```
 

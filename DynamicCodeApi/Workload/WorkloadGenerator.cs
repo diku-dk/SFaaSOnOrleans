@@ -94,7 +94,7 @@ internal class WorkloadGenerator
         var customerID = customerDistribution.Sample();
         var productID = productDistribution.Sample();
         var qty = customerQtyDistribution.Sample();
-
+        throw new NotImplementedException();
         /*
         var price = await client.GetGrain<IProductActor>(productID).GetPrice();
 
@@ -102,8 +102,8 @@ internal class WorkloadGenerator
 
         IAsyncStream<Checkout> checkoutStream = streamProvider.GetStream<Checkout>( Constants.CheckoutNamespace, customerID.ToString() );
         await checkoutStream.OnNextAsync(new Checkout(productID, price, qty));
-        */
         return;
+        */
     }
 
     public async Task<string> GetTopTen()

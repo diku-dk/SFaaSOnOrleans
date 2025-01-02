@@ -50,7 +50,7 @@ Refer to the assignment description in Absalon for a complete
 
 ### <a name="basic-apis"></a>Basic APIs
 
-Your client program offers an HTTP server so you can perform basic operations in your SFaaS platform.
+Your client program offers an HTTP server so you can perform basic operations in your SFaaS platform. Swagger UI can also support you interacting with the APIs through http://localhost:5244/swagger.
 
 To register a simple function, submit a POST request (http://localhost:5244/register) with the following payload:
 ```
@@ -60,7 +60,7 @@ To register a simple function, submit a POST request (http://localhost:5244/regi
 }
 ```
 
-To invoke a function, submit a POST request (http://localhost:5244/execute) with the following payload:
+To invoke a function, submit a POST request (http://localhost:5244/test) with the following payload:
 ```
 {
     "FunctionName": "AddNumbers",
@@ -74,7 +74,7 @@ To register a function that operates with state, make sure Redis is up and runni
 {
     "FunctionName": "TestRedis",
     "Code": "
-            kvs.Put<string>(\"test\",\"test\");
+            kvs.PutString(\"test\",\"test\");
             return kvs.GetString(\"test\");
             "
 }
@@ -84,6 +84,25 @@ Then invoke it:
 ```
 {
     "FunctionName": "TestRedis",
+    "Parameters": []
+}
+```
+
+In case you need to operate with value objects other than strings, make sure to indicate the type when calling the state API:
+
+```
+{
+    "FunctionName": "TestRedisTyped",
+    "Code": "
+            kvs.Put<int>(\"testInt\",1);
+            return kvs.Get<int>(\"testInt\");
+            "
+}
+```
+
+```
+{
+    "FunctionName": "TestRedisTyped",
     "Parameters": []
 }
 ```

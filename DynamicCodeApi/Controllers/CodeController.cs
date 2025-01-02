@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace Controller;
 
 [ApiController]
-[Route("api/[controller]")]
 public class CodeController : ControllerBase
 {
     private readonly IKeyValueStore kvs;
@@ -37,9 +36,9 @@ public class CodeController : ControllerBase
         if (string.IsNullOrWhiteSpace(request.FunctionName) || string.IsNullOrWhiteSpace(request.Code))
             return BadRequest("Function name and code must be provided.");
 
-        this.kvs.Put(request.FunctionName, request.Code);
-        
-        return Ok($"Function '{request.FunctionName}' registered successfully.");
+        if(this.kvs.PutString(request.FunctionName, request.Code))
+            return Ok($"Function '{request.FunctionName}' registered successfully.");
+        return BadRequest($"Error registering function: {request.FunctionName}");
     }
 
     // TODO Register function composition
@@ -91,6 +90,14 @@ public class CodeController : ControllerBase
     {
         // TODO pick a well-defind MediatorGrain and call InitWorkflow
         throw new NotImplementedException();
+    }
+
+    // Clear Redis
+    [HttpPost("resetKVS")]
+    public IActionResult ResetKVS()
+    {
+        this.kvs.Reset();
+        return Ok();
     }
 
 }

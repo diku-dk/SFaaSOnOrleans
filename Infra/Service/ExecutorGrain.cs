@@ -19,11 +19,11 @@ public class ExecutorGrain : Grain, IExecutorGrain
     // Use logger if necessary
     private readonly ILogger<ExecutorGrain> logger;
 
-	public ExecutorGrain(IKeyValueStore kvs, ILogger<ExecutorGrain> logger)
+    public ExecutorGrain(IKeyValueStore kvs, ILogger<ExecutorGrain> logger)
 	{
         this.kvs = kvs;
         this.logger = logger;
-	}
+    }
 
     public Task<object> Execute(string functionName, object[] parameters)
     {
@@ -53,6 +53,7 @@ public class ExecutorGrain : Grain, IExecutorGrain
                 public object Execute(params object[] args)
                 {{
                     {code}
+                    return null; // Fallback for functions not returning result
                 }}
             }}";
 
@@ -73,10 +74,10 @@ public class ExecutorGrain : Grain, IExecutorGrain
 
 	public static Assembly CompileAssembly(string functionName, string code)
     {
+        // Compile the wrapped code
         var syntaxTree = CSharpSyntaxTree.ParseText(code);
-
         var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(a => !a.IsDynamic)
+            .Where(a => !a.IsDynamic && !string.IsNullOrEmpty(a.Location))
             .Select(a => MetadataReference.CreateFromFile(a.Location))
             .ToList();
 

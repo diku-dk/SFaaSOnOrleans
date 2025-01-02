@@ -6,7 +6,7 @@ namespace Infra.Kafka;
 [Reentrant]
 public class MediatorGrain : Grain, IMediatorGrain
 {
-	private IConsumer<string, string> _consumer;
+    private IConsumer<string, string> _consumer;
 
     private string _topic;
     private int _partition;
@@ -18,10 +18,10 @@ public class MediatorGrain : Grain, IMediatorGrain
     private TopicPartition topicPartition;
 
     public override Task OnActivateAsync(CancellationToken cancellationToken)
-	{
-    	this.cancellationToken = cancellationToken;
+    {
+        this.cancellationToken = cancellationToken;
         return Task.CompletedTask;
-	}
+    }
 
     public Task Init(string Topic, string GroupId, int Partition, int Offset)
     {
@@ -68,10 +68,10 @@ public class MediatorGrain : Grain, IMediatorGrain
         return res.Status == PersistenceStatus.Persisted;
     }
 
-	private async Task StartConsuming(CancellationToken cancellationToken)
-	{
-    	try
-    	{
+    private async Task StartConsuming(CancellationToken cancellationToken)
+    {
+        try
+        {
             while (!cancellationToken.IsCancellationRequested)
             {
                 try
@@ -84,25 +84,25 @@ public class MediatorGrain : Grain, IMediatorGrain
                     Console.WriteLine($"Consume error: {e.Error.Reason}");
                 }
             }
-    	}
-    	catch (Exception){}
-    	finally
-    	{
+        }
+        catch (Exception){}
+        finally
+        {
             this._consumer.Close();
-    	}
-	}
+        }
+    }
 
-	private static Task ProcessMessageAsync(string key, string value)
-	{
-    	// TODO Handle the Kafka message. In particular, trigger an executor grain, receive the function output, assemble it into an event, and publish it to the correct Kafka topic/partition. Make sure to acknowledge the processing of Kafka message correctly in order to ensure exactly-once processing.
-    	Console.WriteLine($"Received message: Key = {key}, Value = {value}");
-    	throw new NotImplementedException();
-	}
+    private static Task ProcessMessageAsync(string key, string value)
+    {
+        // TODO Handle the Kafka message. In particular, trigger an executor grain, receive the function output, assemble it into an event, and publish it to the correct Kafka topic/partition. Make sure to acknowledge the processing of Kafka message correctly in order to ensure exactly-once processing.
+        Console.WriteLine($"Received message: Key = {key}, Value = {value}");
+        throw new NotImplementedException();
+    }
 
-	public override Task OnDeactivateAsync(DeactivationReason reason, CancellationToken cancellationToken)
-	{
-    	this._consumer.Dispose();
+    public override Task OnDeactivateAsync(DeactivationReason reason, CancellationToken cancellationToken)
+    {
+        this._consumer.Dispose();
         return Task.CompletedTask;
-	}
+    }
 }
 

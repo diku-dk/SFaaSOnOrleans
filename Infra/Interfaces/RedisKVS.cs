@@ -22,26 +22,33 @@ public class RedisKVS : IKeyValueStore
 	{
 		var db = this._connections["Primary"].GetDatabase();
 		RedisValue value = db.StringGet(key);
-        return value.HasValue ? value : default;
+		return value.HasValue ? value : "";
+	}
+
+	public bool PutString(string key, string value)
+	{
+		var db = this._connections["Primary"].GetDatabase();
+		return db.StringSet(key, value);
 	}
 
     public T Get<T>(string key)
 	{
 		var db = this._connections["Primary"].GetDatabase();
 		RedisValue value = db.StringGet(key);
-        return value.HasValue ? JsonConvert.DeserializeObject<T>(value) : default;
+		return value.HasValue ? JsonConvert.DeserializeObject<T>(value) : default;
 	}
 
-    public void Put<T>(string key, T value)
+	public bool Put<T>(string key, T value)
 	{
-        var db = this._connections["Primary"].GetDatabase();
-		if(value is string valStr)
-		{
-			db.StringSet(key, valStr);
-		} else {
-			var serialized = JsonConvert.SerializeObject(value);
-			db.StringSet(key, serialized);
-		}
+		var db = this._connections["Primary"].GetDatabase();
+		var serialized = JsonConvert.SerializeObject(value);
+		return db.StringSet(key, serialized);
+	}
+
+	public void Reset()
+	{
+		var db = this._connections["Primary"].GetDatabase();
+		db.Execute("flushdb");
 	}
 
 }

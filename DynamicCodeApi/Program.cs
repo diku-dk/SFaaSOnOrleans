@@ -2,7 +2,7 @@ using Infra.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add KVS implementation to your controller
+// Add KVS implementation to the container
 builder.Services.AddSingleton<IKeyValueStore, RedisKVS>();
 
 // Add services to the container
@@ -18,7 +18,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.MapControllers();
 
 app.Run();
